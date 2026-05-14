@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { CourseModule } from './course/course.module';
+import { EnrollmentModule } from './enrollment/enrollment.module';
 
 @Module({
   imports: [
@@ -11,7 +13,7 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true //agar tidak perlu import ConfigModule berulang kali
     }),
     PrismaModule, 
-    AuthModule
+    AuthModule, CourseModule, EnrollmentModule
   ],
   controllers: [AppController],
   providers: [AppService],
