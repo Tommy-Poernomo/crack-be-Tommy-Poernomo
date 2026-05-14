@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+//  url       = env("DATABASE_URL")
+//  directUrl = env("DIRECT_URL")
+}
+
+// Enum untuk tingkatan akses
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+// 1. Model User (Pondasi Utama)
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relasi: Teacher yang membuat kursus
+  coursesCreated Course[]     @relation("TeacherToCourse")
+  
+  // Relasi: Student yang mendaftar ke kursus
+  enrollments    Enrollment[]
+}
+
+// 2. Model Course (Materi Pembelajaran)
+model Course {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  thumbnail   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Hubungan ke pembuat (Teacher)
+  teacherId   Int
+  teacher     User     @relation("TeacherToCourse", fields: [teacherId], references: [id])
+
+  // Relasi ke pendaftaran siswa
+  enrollments Enrollment[]
+}
+
+// 3. Model Enrollment (Tabel Penghubung Many-to-Many + Progress)
+model Enrollment {
+  id        Int      @id @default(autoincrement())
+  enrolledAt DateTime @default(now())
+  status    String   @default("START") // START, PROGRESS, COMPLETED
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+
+  courseId  Int
+  course    Course   @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId]) // Agar satu siswa tidak daftar kursus yang sama dua kali
+}
