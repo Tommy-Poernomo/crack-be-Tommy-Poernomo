@@ -23,4 +23,10 @@ export class AuthController {
   getProfile(@Request() req){
   return req.user;
   }
+
+  @UseGuards(AuthGuard('jwt')) // Amankan data user dengan JWT token
+  @Get('users')
+  getUsers() {
+    return this.authService.findAllUsers();
+  }
 }

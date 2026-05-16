@@ -53,4 +53,17 @@ export class AuthService {
       }
     };
   }
+
+  //Fungsi Penarik Data User untuk ditampilkan di Admin
+  async findAllUsers() {
+  return this.prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true,
+    },
+  });
+}
 }
