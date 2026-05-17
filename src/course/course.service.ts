@@ -21,6 +21,9 @@ export class CourseService {
 
   async findAll() {
     return this.prisma.course.findMany({
+      orderBy: {
+        id: 'desc', // Kursus terbaru muncul di awal
+      },
       include: {
         teacher: {
           select: { name: true, email: true } // Menampilkan info pengajar
@@ -39,7 +42,8 @@ export class CourseService {
       id: 'asc'
     },
     include: {
-        teacher: { select: { name: true } }
+        teacher: { select: { name: true } },
+        enrollments: true
     }
   });
 }
@@ -100,6 +104,39 @@ async updateCourse(courseId: number, teacherId: number, updateDto: any) {
   return this.prisma.course.update({
     where: { id: courseId },
     data: updateDto
+  });
+}
+async findCourseStudents(courseId: number, teacherId: number) {
+  // 1. Validasi dulu apakah kursus ini benar milik guru yang mengakses
+  const course = await this.prisma.course.findUnique({
+    where: { id: courseId },
+  });
+
+  if (!course) {
+    throw new NotFoundException('Kursus tidak ditemukan');
+  }
+
+  if (course.teacherId !== teacherId) {
+    throw new ForbiddenException('Anda tidak memiliki hak akses untuk melihat data kursus ini!');
+  }
+
+  // 2. Jika lolos validasi, tarik data pendaftaran siswa
+  return this.prisma.enrollment.findMany({
+    where: {
+      courseId: courseId,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+    orderBy: {
+      id: 'desc', // Siswa yang baru daftar muncul paling atas dan Gunakan 'id' karena tipe data Auto Increment pasti punya ID
+    },
   });
 }
 }

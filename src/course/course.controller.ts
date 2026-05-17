@@ -1,4 +1,4 @@
-import { Controller, Post, Put, Get, Delete, Patch, Body, UseGuards, Request, Param, ParseIntPipe, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Put, Get, Delete, Patch, Body, UseGuards, Request, Param, ParseIntPipe, ForbiddenException, NotFoundException, Req } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -25,6 +25,16 @@ export class CourseController {
       throw new ForbiddenException('Hanya pengajar yang dapat membuat kursus!');
     }
     return this.courseService.create(dto, req.user.userId);
+  }
+
+@UseGuards(AuthGuard('jwt'))
+  @Get(':id/students')
+  async getCourseStudents(
+    @Param('id', ParseIntPipe) id: number,
+    @Request() req,
+  ) {
+    // req.user.userId didapat dari token JWT guru yang sedang aktif
+    return this.courseService.findCourseStudents(id, req.user.userId);
   }
 
   // Mengambil semua kelas (untuk publik/siswa)

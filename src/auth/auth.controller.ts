@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, Request, HttpCode, HttpStatus, Delete, Patch, ParseIntPipe, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { AuthGuard } from '@nestjs/passport' ;
@@ -29,4 +29,22 @@ export class AuthController {
   getUsers() {
     return this.authService.findAllUsers();
   }
+
+  // Endpoint UPDATE: PATCH /auth/users/:id
+  @UseGuards(AuthGuard('jwt'))
+  @Patch('users/:id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { name: string; email: string },
+  ) {
+    return this.authService.updateTeacher(id, body);
+  }
+
+  // Endpoint DELETE: DELETE /auth/users/:id
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('users/:id')
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.authService.deleteTeacher(id);
+  }
+
 }

@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -64,6 +64,40 @@ export class AuthService {
       role: true,
       createdAt: true,
     },
-  });
-}
+    });
+  }
+
+  // 1. Fungsi UPDATE: Mengubah data profile Guru
+  async updateTeacher(id: number, data: { name: string; email: string }) {
+    // Pastikan user-nya ada di database
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('Akun pengajar tidak ditemukan');
+    }
+
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        name: data.name,
+        email: data.email,
+      },
+    });
+  }
+
+  // 2. Fungsi DELETE: Menghapus akun Guru dari sistem
+  async deleteTeacher(id: number) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('Akun pengajar tidak ditemukan');
+    }
+
+    // Menghapus data user (relasi kursus akan ikut terhapus jika di schema.prisma dipasang onDelete: Cascade)
+    await this.prisma.user.delete({ where: { id } });
+    
+    return {
+      success: true,
+      message: 'Akun pengajar berhasil dihapus dari database sistem.',
+    };
+  }
+
 }

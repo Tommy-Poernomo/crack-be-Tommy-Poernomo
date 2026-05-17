@@ -12,11 +12,9 @@ export default defineConfig({
   //   url: process.env["DATABASE_URL"],
   // },
   datasource: {
-    // url: process.env.DATABASE_URL,
-    // directUrl: process.env.DIRECT_URL,
-    // Gunakan DIRECT_URL (Port 5432) agar tidak hang saat push
-    //url: process.env.DIRECT_URL, 
-    url: process.env.DATABASE_URL,
+     // Gunakan DIRECT_URL (Port 5432) agar tidak hang saat push
+    url: process.env.DIRECT_URL, 
+    //url: process.env.DATABASE_URL,
 
   },
 });
