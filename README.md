@@ -1,3 +1,40 @@
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/PzCCy7VV)
 
 <p align="center">
@@ -102,6 +139,9 @@ src/
 
 ### Public Landing Page
 ![Landing Page](https://placehold.co/600x400?text=Insert+Landing+Page+Screenshot+Here)
+
+### Login page
+![Login Page Layout](./assets/Login%20Page.jpg)
 
 ### Admin Panel & Teacher Management
 ![Admin CRUD](https://placehold.co/600x400?text=Insert+Admin+Panel+Screenshot+Here)
@@ -249,7 +289,7 @@ All API requests must be prefixed with `http://localhost:3000/`. Protected route
 
 ## 💡 Demo Guide for Team Lead Evaluation
 
-When demonstrating this platform to the RevoU Team Lead, follow this exact workflow to showcase the robust Full-CRUD functionality:
+When demonstrating this platform, follow this exact workflow to showcase the robust Full-CRUD functionality:
 
 1.  **Public Layer:** Visit `http://localhost:3001/` to verify the public catalog successfully fetches live courses from the database without requiring authentication.
 2.  **Admin Flow:** Log in as Admin -> Create a new Teacher account -> Edit the Teacher's title -> Verify the live updates on the data table.
@@ -343,3 +383,4 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
