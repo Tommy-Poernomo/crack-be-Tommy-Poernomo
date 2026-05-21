@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, UseGuards, Request, HttpCode, HttpStatus, Delete, Patch, ParseIntPipe, Param } from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, Request, HttpCode, HttpStatus, Delete, Patch, ParseIntPipe, Param, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { AuthGuard } from '@nestjs/passport' ;
@@ -47,4 +47,29 @@ export class AuthController {
     return this.authService.deleteTeacher(id);
   }
 
+  // ✨ Menggunakan AuthGuard('jwt') bawaan passport langsung
+@UseGuards(AuthGuard('jwt')) 
+  @Patch('profile-update')
+  async updateProfile(@Req() req: any, @Body() updateData: { name?: string; password?: string }) {
+    // 🔍 INSPEKSI BACKEND: Cetak isi req.user ke terminal lms-dkv-be untuk melihat strukturnya
+    // console.log("=== DEBUG REQ.USER PROFILE ===");
+    // console.log("Isi objek req.user:", req.user);
+
+    // Deteksi cerdas berbagai kemungkinan nama field ID yang dihasilkan oleh JwtStrategy kamu
+    let userId = null;
+    
+    if (req.user) {
+      userId = req.user.id || req.user.userId || req.user.sub || req.user.id_user;
+    }
+
+    // Jika masih tidak ketemu, coba periksa apakah objek user dibungkus di dalam properti lain
+    if (!userId && req.user?.user) {
+      userId = req.user.user.id || req.user.user.userId;
+    }
+
+    // console.log("ID Hasil Ekstraksi Kontroller:", userId);
+    // console.log("===============================");
+
+    return this.authService.updateProfile(userId, updateData);
+  }
 }

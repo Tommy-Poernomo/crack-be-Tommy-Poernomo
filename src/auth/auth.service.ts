@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -69,7 +69,7 @@ export class AuthService {
 
   // 1. Fungsi UPDATE: Mengubah data profile Guru
   async updateTeacher(id: number, data: { name: string; email: string }) {
-    // Pastikan user-nya ada di database
+    // Memastikan user-nya ada di database
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException('Akun pengajar tidak ditemukan');
@@ -100,4 +100,42 @@ export class AuthService {
     };
   }
 
+  // ✨ Update Nama dan Password Profil, Proses filter ketat data profil masuk
+async updateProfile(userId: any, updateData: { name?: string; password?: string }) {
+    // Jika userId terdeteksi, paksa konversi ke tipe data Number murni
+    const parsedUserId = userId ? Number(userId) : NaN;
+
+    if (!parsedUserId || isNaN(parsedUserId)) {
+      throw new BadRequestException('⚠️ Gagal memperbarui profil: ID Pengguna tidak terdeteksi atau tidak valid di dalam token sesi Anda.');
+    }
+
+    const dataToUpdate: any = {};
+
+    if (updateData.name && updateData.name.trim() !== '') {
+      dataToUpdate.name = updateData.name.trim();
+    }
+
+    if (updateData.password && updateData.password.trim() !== '') {
+      dataToUpdate.password = updateData.password.trim(); 
+    }
+
+    try {
+      const updatedUser = await this.prisma.user.update({
+        where: { id: parsedUserId }, // Gunakan ID yang sudah divalidasi angka
+        data: dataToUpdate,
+      });
+
+      return {
+        message: '🎉 Profil berhasil diperbarui!',
+        user: {
+          name: updatedUser.name,
+          email: updatedUser.email,
+          role: updatedUser.role,
+        },
+      };
+    } catch (dbError) {
+      console.error("Gagal eksekusi Prisma Update Profile:", dbError);
+      throw new InternalServerErrorException('Gagal menyimpan perubahan profil ke database.');
+    }
+  }
 }
