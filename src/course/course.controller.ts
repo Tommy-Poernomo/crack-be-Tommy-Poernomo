@@ -1,4 +1,4 @@
-import { Controller, Post, Put, Get, Delete, Patch, Body, UseGuards, Request, Param, ParseIntPipe, ForbiddenException, NotFoundException, Req } from '@nestjs/common';
+import { Controller, Post, Put, Get, Delete, Patch, Body, UseGuards, Request, Param, ParseIntPipe, ForbiddenException, NotFoundException, Req, Query } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -38,10 +38,11 @@ export class CourseController {
   }
 
   // Mengambil semua kelas (untuk publik/siswa)
-  @UseGuards(AuthGuard('jwt'))
+  //@UseGuards(AuthGuard('jwt')) dimatikan agar siswa/publik bisa lihat semua kursus tanpa harus login, tapi tetap bisa lihat kursus miliknya jika login
   @Get()
-  findAll() {
-    return this.courseService.findAll();
+  async findAll(@Query('search') search?: string) {
+    // Meneruskan parameter kata kunci pencarian dari query url ke dalam service
+    return this.courseService.findAll(search);
   }
 
   // Mengedit kursus dengan proteksi/validasi kepemilikan
@@ -66,5 +67,13 @@ export class CourseController {
       throw new NotFoundException(`Kursus dengan ID ${id} tidak ditemukan`);
     }
     return { message: 'Kursus berhasil dihapus' };
+  }
+  // Mengambil detail SATU kursus berdasarkan ID
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const course = await this.courseService.findOne(id); // Pastikan fungsi findOne(id) ini sudah ada di course.service.ts
+    if (!course) throw new NotFoundException(`Kursus dengan ID ${id} tidak ditemukan`);
+    return course;
   }
 }

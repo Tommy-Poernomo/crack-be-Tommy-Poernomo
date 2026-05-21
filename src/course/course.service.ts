@@ -19,16 +19,48 @@ export class CourseService {
     });
   }
 
-  async findAll() {
+//   async findAll() {
+//     return this.prisma.course.findMany({
+//       orderBy: {
+//         id: 'desc', // Kursus terbaru muncul di awal
+//       },
+//       include: {
+//         teacher: {
+//           select: { name: true } // Menampilkan info pengajar
+//         }
+//       }
+//     });
+//   }
+//   // Untuk pencarian kelas
+// async findAll(search?: string) {
+//   return this.prisma.course.findMany({
+//     where: search ? {
+//       title: { contains: search, mode: 'insensitive' } // Siswa ketik "DKV" langsung muncul kelas DKV
+//     } : {},
+//   });
+// }
+// =========================================================================
+  // MENAMPILKAN SEMUA KELAS TERSEDIA DENGAN FITUR PENCARIAN (SEARCH FILTER)
+  // =========================================================================
+  async findAll(search?: string) {
     return this.prisma.course.findMany({
-      orderBy: {
-        id: 'desc', // Kursus terbaru muncul di awal
-      },
+      where: search
+        ? {
+            title: {
+              contains: search,
+              mode: 'insensitive', // Mengabaikan huruf besar/kecil (cth: dkv atau DKV sama saja)
+            },
+          }
+        : {},
       include: {
         teacher: {
-          select: { name: true, email: true } // Menampilkan info pengajar
-        }
-      }
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -47,6 +79,15 @@ export class CourseService {
     }
   });
 }
+
+async findOne(id: number) {
+    return this.prisma.course.findUnique({
+      where: { id },
+      include: {
+        lessons: true, // ✨ TRICK PRO: Otomatis ikut menarik data semua bab materi yang tersambung dengan kelas ini!
+      },
+    });
+  }
 
   async remove(id: number, teacherId: number) {
   // 1. Cari kursusnya dulu
@@ -139,4 +180,5 @@ async findCourseStudents(courseId: number, teacherId: number) {
     },
   });
 }
+
 }

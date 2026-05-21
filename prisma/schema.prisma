@@ -53,6 +53,8 @@ model Course {
 
   // Relasi ke pendaftaran siswa
   enrollments Enrollment[]
+  lessons Lesson[]
+  assignments Assignment[]
 }
 
 // 3. Model Enrollment (Tabel Penghubung Many-to-Many + Progress)
@@ -68,4 +70,34 @@ model Enrollment {
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId]) // Agar satu siswa tidak daftar kursus yang sama dua kali
+}
+
+model Lesson {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String   @db.Text
+  courseId  Int
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Assignment {
+  id          Int          @id @default(autoincrement())
+  title       String       // Contoh: "Tugas Foto Macro Serangga"
+  instruction String       @db.Text
+  dueDate     DateTime
+  courseId    Int
+  course      Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+  createdAt   DateTime     @default(now())
+}
+
+model Submission {
+  id           Int        @id @default(autoincrement())
+  imagePath    String     // URL atau nama file gambar JPG/PNG yang diupload
+  studentId    Int        // ID Siswa yang mengumpulkan
+  studentName  String     // Menyimpan nama siswa untuk mempermudah showcase
+  assignmentId Int
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
 }
